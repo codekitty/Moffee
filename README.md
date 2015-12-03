@@ -11,7 +11,7 @@ Here are some screenshots:
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/RequestMoffee.png" width=40%> <br>
 
 <b>Requests NoSQL table in Parse</b><br>
-<img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/requests_table.png" width=40%> <br>
+<img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/requests_table.png" width=70%> <br>
 
 <b>Cancel Moffee</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/CancelMoffee.png" width=40%> <br>
@@ -20,4 +20,4 @@ Here are some screenshots:
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/MoferRequests.png" width=40%> <br>
 
 <b>Users table in Parse</b><br>
-<img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/users_table.png" width=40%> <br>
+<img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/users_table.png" width=70%> <br>
