@@ -4,20 +4,20 @@
 
 Here are some screenshots:
 
-<b>Login</b>
+<b>Login</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/login.png" width=40%> <br>
 
-<b>Request Moffee</b>
+<b>Request Moffee</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/RequestMoffee.png" width=40%> <br>
 
-<b>Requests NoSQL table in Parse</b>
+<b>Requests NoSQL table in Parse</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/requests_table.png" width=40%> <br>
 
-<b>Cancel Moffee</b>
+<b>Cancel Moffee</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/CancelMoffee.png" width=40%> <br>
 
-<b>Current Mofer Requests</b>
+<b>Current Mofer Requests</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/MoferRequests.png" width=40%> <br>
 
-<b>Users table in Parse</b>
+<b>Users table in Parse</b><br>
 <img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/users_table.png" width=40%> <br>
