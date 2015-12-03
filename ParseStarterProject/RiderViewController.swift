@@ -1,10 +1,7 @@
 //
 //  RiderViewController.swift
 //  Moffee
-//
-//  Created by Guilherme Souza on 10/23/15.
-//  Copyright © 2015 Parse. All rights reserved.
-//
+
 
 import UIKit
 import MapKit
