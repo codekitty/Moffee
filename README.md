@@ -4,7 +4,7 @@ An uber for coffee.
 
 Here are some screenshots:
 
-![Login](https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/login.png)
+<img src="https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/login.png" width=30%> <br>
 
 ![Request Moffee](https://github.com/codekitty/Moffee/blob/master/Images/Screenshots/RequestMoffee.png)
 
