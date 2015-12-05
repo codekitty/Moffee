@@ -21,6 +21,8 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
     
     var driverOnTheWay = false
     
+    var userLocation: CLLocation?;
+    
     @IBAction func callUber(sender: AnyObject) {
         if uberRequested == false {
             let riderRequest = PFObject(className: "RiderRequest")
@@ -159,12 +161,20 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
                 })
             }
             
-            if driverOnTheWay == false {
+            let currLocation  = CLLocation(latitude: location.latitude, longitude: location.longitude);
+
+            
+            if driverOnTheWay == false && (userLocation == nil || currLocation.distanceFromLocation(userLocation!) > 10) {
                 
                 let center = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+                userLocation = CLLocation(latitude: location.latitude, longitude: location.longitude);
+               
                 let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                 
+                // TODO if curr center is the same as center within epsilon don't update region
+                
                 self.mapView.setRegion(region, animated: true)
+                print("setting region");
                 
                 self.mapView.removeAnnotations(mapView.annotations)
                 
