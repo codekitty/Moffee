@@ -67,14 +67,6 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
             
         }
         
-        
-        
-        
-        
-        
-        
-        
-        
         // Query the requests for displaying on the table
         query = PFQuery(className: "RiderRequest")
         query.whereKey("location", nearGeoPoint: PFGeoPoint(latitude: self.latitude, longitude: self.longitude))
@@ -111,12 +103,12 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                         
                     }
                     self.tableView.reloadData()
-//                    print(self.locations)
-//                    print(self.usernames)
+                    //print(self.locations)
+                    //print(self.usernames)
                 }
                 
             } else {
-                // treat error
+                print(error);
             }
             
         }

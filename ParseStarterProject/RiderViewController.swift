@@ -8,7 +8,7 @@ import MapKit
 import CoreLocation
 import Parse
 
-class RiderViewController: UIViewController, CLLocationManagerDelegate {
+class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
     @IBOutlet weak var callUberButton: UIButton!
     @IBOutlet weak var mapView: MKMapView!
@@ -21,13 +21,31 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
     
     var driverOnTheWay = false
     
+    var lastLocation: CLLocation!;
+    
     var userLocation: CLLocation?;
+    
+    let userAnnotationTitle = "You are here";
+    let driverAnnotationTitle = "Your Coffee is Here"
     
     @IBAction func callUber(sender: AnyObject) {
         if uberRequested == false {
+
+            if self.mapView.selectedAnnotations.count == 0 {
+                print("Please select a coffee shop")
+                Helpers.displayAlert("Please select a coffee shop", message: "Please select a coffee shop", viewController: self)
+                return
+            }
+            
+            let ann = self.mapView.selectedAnnotations[0]
+            print ("\(ann.title!)")
+            
+            
             let riderRequest = PFObject(className: "RiderRequest")
             riderRequest["username"] = PFUser.currentUser()!.username
             riderRequest["location"] = PFGeoPoint(latitude: latitude, longitude: longitude)
+            riderRequest["coffeeshopname"] = ann.title!
+            riderRequest["coffeeshopid"] = ann.subtitle!
             riderRequest.saveInBackgroundWithBlock { (success, error) -> Void in
                 if success {
                     self.callUberButton.setTitle("Cancel Moffee", forState: UIControlState.Normal)
@@ -73,7 +91,8 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
         
-        
+        mapView.delegate = self
+        mapView.showsUserLocation = true;
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -81,6 +100,13 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
         if manager.location?.coordinate != nil {
             
             let location: CLLocationCoordinate2D = (manager.location?.coordinate)!
+            
+            if (userLocation != nil) {
+//                let distanceUserMoved = userLocation?.distanceFromLocation(CLLocation(latitude: location.latitude, longitude: location.longitude));
+//                print("distance user \(distanceUserMoved)");
+//                userLocation = CLLocation(latitude: location.latitude, longitude: location.longitude);
+            }
+            
             
             latitude = location.latitude
             longitude = location.longitude
@@ -134,13 +160,13 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
                                                         var pinLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(location.latitude, location.longitude)
                                                         var objectAnnotation = MKPointAnnotation()
                                                         objectAnnotation.coordinate = pinLocation
-                                                        objectAnnotation.title = "You are here"
+                                                        objectAnnotation.title = self.userAnnotationTitle
                                                         self.mapView.addAnnotation(objectAnnotation)
                                                         
                                                         pinLocation = CLLocationCoordinate2DMake(driverLocation.latitude, driverLocation.longitude)
                                                         objectAnnotation = MKPointAnnotation()
                                                         objectAnnotation.coordinate = pinLocation
-                                                        objectAnnotation.title = "Driver is here"
+                                                        objectAnnotation.title = self.driverAnnotationTitle
                                                         self.mapView.addAnnotation(objectAnnotation)
                                                         
                                                     }
@@ -161,40 +187,92 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
                 })
             }
             
-            let currLocation  = CLLocation(latitude: location.latitude, longitude: location.longitude);
-
-            
-            if driverOnTheWay == false && (userLocation == nil || currLocation.distanceFromLocation(userLocation!) > 10) {
+            if driverOnTheWay == false && userLocation == nil {
                 
                 let center = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-                userLocation = CLLocation(latitude: location.latitude, longitude: location.longitude);
-               
+                self.userLocation = CLLocation(latitude: location.latitude, longitude: location.longitude);
+
                 let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                 
-                // TODO if curr center is the same as center within epsilon don't update region
-                
                 self.mapView.setRegion(region, animated: true)
-                print("setting region");
+                print("region set");
                 
                 self.mapView.removeAnnotations(mapView.annotations)
-                
-                let pinLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(location.latitude, location.longitude)
-                let objectAnnotation = MKPointAnnotation()
-                objectAnnotation.coordinate = pinLocation
-                objectAnnotation.title = "You are here"
-                self.mapView.addAnnotation(objectAnnotation)
             }
-            
         }
+    }
+    
+    func fetchCafesAroundLocation(center:CLLocation){
+        let annotationsToRemove = mapView.annotations.filter { $0 !== mapView.userLocation }
+        mapView.removeAnnotations( annotationsToRemove );
+        
+        // add nearby coffee places
+        print("fetching nearby coffee places...")
+        let request = MKLocalSearchRequest()
+        request.naturalLanguageQuery = "Coffee"
+        request.region = mapView.region
+        
+        let search = MKLocalSearch(request: request)
+        
+        search.startWithCompletionHandler ({(response, error) -> Void in
+            
+            if error != nil {
+                print("Error occured in search: \(error!.localizedDescription)")
+            } else if response!.mapItems.count == 0 {
+//                print("No matches found")
+            } else {
+//                print("Matches found")
+                
+                for item in response!.mapItems {
+                    if item.phoneNumber != nil {
+//                        print("Name = \(item.name)")
+//                        print("Phone = \(item.phoneNumber)")
+                        
+                        let annotation = MKPointAnnotation()
+                        annotation.coordinate = item.placemark.coordinate
+                        annotation.title = item.name
+                        annotation.subtitle = item.phoneNumber
+                        self.mapView.addAnnotation(annotation)
+                    }
+                }
+            }
+        })
+
         
     }
     
-    
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool){
+//        print("region did change");
+        
+        let centre = mapView.centerCoordinate as CLLocationCoordinate2D
+        
+        let getLat: CLLocationDegrees = centre.latitude
+        let getLon: CLLocationDegrees = centre.longitude
+        
+        
+        let getMovedMapCenter: CLLocation =  CLLocation(latitude: getLat, longitude: getLon)
+        if self.lastLocation != nil {
+            let distanceMapMoved = self.lastLocation.distanceFromLocation(getMovedMapCenter)
+            print("moved this much: \(distanceMapMoved)")
+            if distanceMapMoved < 80 {
+                return
+            }
+        }
+        self.lastLocation = getMovedMapCenter
+        
+        let deltaLatitude = self.mapView.region.span.latitudeDelta;
+        let deltaLongitude = self.mapView.region.span.longitudeDelta;
+        let regionSize = deltaLatitude * deltaLongitude;
+        
+        if (regionSize < 0.0003) {
+            self.fetchCafesAroundLocation(getMovedMapCenter)
+        }
+    }
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
     
     
     // MARK: - Navigation
@@ -209,6 +287,31 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate {
             PFUser.logOut()
         }
         
+    }
+    
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+//        print("creating annotation views")
+        if annotation.isEqual(mapView.userLocation) {
+            return nil;
+        }
+        
+        let pinView:MKPinAnnotationView = MKPinAnnotationView()
+        pinView.annotation = annotation
+        if (annotation.title! == userAnnotationTitle) {
+            pinView.pinTintColor = UIColor.blueColor()
+            pinView.animatesDrop = false
+        } else if (annotation.title! == driverAnnotationTitle) {
+            pinView.pinTintColor = UIColor.greenColor()
+            pinView.animatesDrop = true
+        } else {
+            pinView.pinTintColor = UIColor.redColor()
+            pinView.animatesDrop = true
+        }
+        
+        pinView.canShowCallout = true
+        
+        return pinView
+
     }
     
     

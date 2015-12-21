@@ -18,18 +18,31 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
         let query = PFQuery(className: "RiderRequest")
         query.whereKey("username", equalTo: requestUsername)
         
-        query.findObjectsInBackgroundWithBlock { (objects, error) -> Void in
+        query.findObjectsInBackgroundWithBlock { (user_requests, error) -> Void in
             
             if error == nil {
-                if let objects = objects {
-                    for object in objects {
+                if let user_requests = user_requests {
+                    
+                    
+                    for user_request in user_requests {
                         
                         let query = PFQuery(className: "RiderRequest")
-                        query.getObjectInBackgroundWithId(object.objectId!, block: { (objectReturned, error) -> Void in
+                        query.getObjectInBackgroundWithId(user_request.objectId!, block: { (objectReturned, error) -> Void in
                             if error == nil {
-                                if let objectReturned = objectReturned {
-                                    objectReturned["driverResponded"] = PFUser.currentUser()?.username
-                                    objectReturned.saveInBackground()
+                                
+                                if (objectReturned != nil) {
+                                    //print("updating driver: \(PFUser.currentUser()?.username)");
+                                    //print("to object: \(objectReturned)");
+                                    // driver will not update until we change the permissions \ ACL!!!
+                                    objectReturned!["driverResponded"] = PFUser.currentUser()?.username
+                                    objectReturned!.saveInBackgroundWithBlock {
+                                        (success: Bool, error: NSError?) -> Void in
+                                        if (success) {
+                                            print("driver has been updated");
+                                        } else {
+                                            print(error);
+                                        }
+                                    }
                                     
                                     let requestCLLocation = CLLocation(latitude: self.requestLocation.latitude, longitude: self.requestLocation.longitude)
                                     CLGeocoder().reverseGeocodeLocation(requestCLLocation, completionHandler: { (placemarks, error) -> Void in
@@ -38,7 +51,7 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
                                             print("Reverse geocoder failed with " + error!.localizedDescription)
                                         } else {
                                             if placemarks!.count > 0 {
-                                                let pm = placemarks![0] as! CLPlacemark
+                                                let pm = placemarks![0];
                                                 let mkPm = MKPlacemark(placemark: pm)
                                                 let mapItem = MKMapItem(placemark: mkPm)
                                                 
@@ -65,8 +78,8 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
 
         // Do any additional setup after loading the view.
         
-        print(requestLocation)
-        print(requestUsername)
+        //print(requestLocation)
+        //print(requestUsername)
         
         let center = CLLocationCoordinate2D(latitude: requestLocation.latitude, longitude: requestLocation.longitude)
         let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
