@@ -33,7 +33,7 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
 
             if self.mapView.selectedAnnotations.count == 0 {
                 print("Please select a coffee shop")
-                Helpers.displayAlert("Please select a coffee shop", message: "Please select a coffee shop", viewController: self)
+                Helpers.displayAlert("Operation cannot be performed", message: "Please select a coffee shop", viewController: self)
                 return
             }
             
@@ -46,12 +46,20 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
             riderRequest["location"] = PFGeoPoint(latitude: latitude, longitude: longitude)
             riderRequest["coffeeshopname"] = ann.title!
             riderRequest["coffeeshopid"] = ann.subtitle!
+            
+            // make sure it's public so that drivers can accept request
+            let acl = PFACL()
+            acl.setPublicReadAccess(true)
+            acl.setPublicWriteAccess(true)
+            riderRequest.ACL = acl
+            
+            // save
             riderRequest.saveInBackgroundWithBlock { (success, error) -> Void in
                 if success {
                     self.callUberButton.setTitle("Cancel Moffee", forState: UIControlState.Normal)
                     self.uberRequested = true
                 } else {
-                    Helpers.displayAlert("There was an error.", message: "There was an error on requesting coffee, please try again.", viewController: self)
+                    Helpers.displayAlert("There was an error while saving request.", message: "There was an error on requesting coffee, please try again.", viewController: self)
                 }
             }
         } else {
@@ -101,11 +109,11 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
             
             let location: CLLocationCoordinate2D = (manager.location?.coordinate)!
             
-            if (userLocation != nil) {
+//            if (userLocation != nil) {
 //                let distanceUserMoved = userLocation?.distanceFromLocation(CLLocation(latitude: location.latitude, longitude: location.longitude));
 //                print("distance user \(distanceUserMoved)");
 //                userLocation = CLLocation(latitude: location.latitude, longitude: location.longitude);
-            }
+//            }
             
             
             latitude = location.latitude
@@ -283,10 +291,8 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
         // Pass the selected object to the new view controller.
         
         if segue.identifier == "logOutRider" {
-            
             PFUser.logOut()
         }
-        
     }
     
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
@@ -302,10 +308,10 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
             pinView.animatesDrop = false
         } else if (annotation.title! == driverAnnotationTitle) {
             pinView.pinTintColor = UIColor.greenColor()
-            pinView.animatesDrop = true
+            pinView.animatesDrop = false
         } else {
             pinView.pinTintColor = UIColor.redColor()
-            pinView.animatesDrop = true
+            pinView.animatesDrop = false
         }
         
         pinView.canShowCallout = true
