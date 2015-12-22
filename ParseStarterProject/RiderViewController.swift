@@ -92,6 +92,7 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
                 if success {
                     self.callUberButton.setTitle("Cancel Moffee", forState: UIControlState.Normal)
                     self.lblStatus.text = "Waiting for mofers..."
+                    self.mapView.removeAnnotations(self.mapView.annotations)
                     self.uberRequested = true
                 } else {
                     Helpers.displayAlert("There was an error while saving request.", message: "There was an error on requesting coffee, please try again.", viewController: self)
@@ -115,6 +116,7 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
                             }
                             self.callUberButton.setTitle(self.strRequestMoffee, forState: UIControlState.Normal)
                             self.uberRequested = false
+                            self.lblStatus.text = ""
                         }
                     }
                     
@@ -241,15 +243,15 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
         
         let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
         
-        let latDelta = abs(driverLocation.coordinate.latitude - userLocation.coordinate.latitude) * 2 + 0.0055
-        let longDelta = abs(driverLocation.coordinate.longitude - userLocation.coordinate.longitude) * 2 + 0.0055
+        let latDelta = (abs(driverLocation.coordinate.latitude - userLocation.coordinate.latitude) + 0.006)*2
+        let longDelta = (abs(driverLocation.coordinate.longitude - userLocation.coordinate.longitude) + 0.006)*2
         
         let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: longDelta))
         
         self.mapView.setRegion(region, animated: true)
         
         // remove annotations
-        self.mapView.removeAnnotations(self.mapView.annotations)
+//        self.mapView.removeAnnotations(self.mapView.annotations)
         
         var pinLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(userLocation.coordinate.latitude, userLocation.coordinate.longitude)
         

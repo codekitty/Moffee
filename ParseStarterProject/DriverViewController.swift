@@ -18,6 +18,7 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
     var locationManager: CLLocationManager!
     var latitude: CLLocationDegrees = 0
     var longitude: CLLocationDegrees = 0
+    var refreshTableControl:UIRefreshControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,17 +29,30 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
+
         
+        self.refreshTableControl = UIRefreshControl()
+        self.refreshTableControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        self.refreshTableControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
+        self.tableView.addSubview(refreshTableControl)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        if PFUser.currentUser() == nil {
+            print("user is null")
+            self.performSegueWithIdentifier("logOutDriver", sender: self)
+        }
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         let location = manager.location?.coordinate
+        
         self.latitude = location!.latitude
         self.longitude = location!.longitude
         print("Latitude \(self.latitude) and Longitude \(self.longitude)")
 
-        var query = PFQuery(className: "DriverLocation")
+        let query = PFQuery(className: "DriverLocation")
         query.whereKey("username", equalTo: PFUser.currentUser()!.username!)
         
         query.findObjectsInBackgroundWithBlock { (objects, error) -> Void in
@@ -66,25 +80,35 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                 
             }
         }
+        refresh(self)
+    }
+    
+    func refresh(sender:AnyObject)
+    {
+        // wait until driver location has been updated
+        if latitude == 0 && longitude == 0 {return}
         
         // Query the requests for displaying on the table
-        query = PFQuery(className: "RiderRequest")
-        query.whereKey("location", nearGeoPoint: PFGeoPoint(latitude: self.latitude, longitude: self.longitude),withinKilometers: 20)
-        query.limit = 10
-//        query.orderByDescending("createdAt")
+        let query = PFQuery(className: "RiderRequest")
+        query.whereKey("location", nearGeoPoint: PFGeoPoint(latitude: self.latitude, longitude: self.longitude),withinKilometers: 10)
+        query.limit = 15
+        // query.orderByDescending("createdAt")
         query.findObjectsInBackgroundWithBlock { (objects, error) -> Void in
-
+            
             if error == nil && objects != nil {
                 
                 self.usernames.removeAll()
                 self.locations.removeAll()
                 self.cslocations.removeAll()
+                self.csnames.removeAll()
+                self.distances.removeAll()
+                
                 print("returned request count: \(objects!.count)")
                 
                 for object in objects! {
                     
                     if object["driverResponded"] == nil {
-                    
+                        
                         if let username = object["username"] as? String {
                             self.usernames.append(username)
                         }
@@ -95,7 +119,7 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                             
                             let requestCLLocation = CLLocation(latitude: requestLocation.latitude, longitude: requestLocation.longitude)
                             
-                            let driverCLLocation = CLLocation(latitude: location!.latitude, longitude: location!.longitude)
+                            let driverCLLocation = CLLocation(latitude: self.latitude, longitude: self.longitude)
                             
                             let distance = driverCLLocation.distanceFromLocation(requestCLLocation)
                             
@@ -124,13 +148,14 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                 //print(self.locations)
                 //print(self.usernames)
                 
+                self.refreshTableControl.endRefreshing()
+                
                 
             } else {
                 print(error);
             }
             
         }
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -172,10 +197,13 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
         // Pass the selected object to the new view controller.
         if segue.identifier == "logOutDriver" {
             
-//            locationManager.stopUpdatingLocation()
+            locationManager.stopUpdatingLocation()
             navigationController?.setNavigationBarHidden(true, animated: false)
             
-            PFUser.logOut()
+            if (PFUser.currentUser() != nil) {
+                PFUser.logOut()
+            }
+            
         } else if segue.identifier == "showViewRequests" {
             
             if let destination = segue.destinationViewController as? RequestViewController {
@@ -184,7 +212,10 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                 destination.requestLocation = locations[tableView.indexPathForSelectedRow!.row]
                 destination.requestUsername = usernames[tableView.indexPathForSelectedRow!.row]
                 
-//                locationManager.stopUpdatingLocation()
+                print("names array \(self.csnames)")
+                print("segue with \(destination.requestCSName)")
+                
+                locationManager.stopUpdatingLocation()
             }
             
             

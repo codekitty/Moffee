@@ -7,7 +7,7 @@ import UIKit
 import Parse
 import MapKit
 
-class RequestViewController: UIViewController, CLLocationManagerDelegate {
+class RequestViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     var requestLocation: CLLocationCoordinate2D!
@@ -83,8 +83,13 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
         //print(requestLocation)
         //print(requestUsername)
         
+        
         let center = CLLocationCoordinate2D(latitude: requestLocation.latitude, longitude: requestLocation.longitude)
-        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
+        let latDelta = abs(requestLocation.latitude - requestCSLocation.latitude) * 2 + 0.0055
+        let longDelta = abs(requestLocation.longitude - requestCSLocation.longitude) * 2 + 0.0055
+
+        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: longDelta))
         
         self.mapView.setRegion(region, animated: true)
         
@@ -99,12 +104,50 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
         objectAnnotation.coordinate = pinLocation
         objectAnnotation.title = requestCSName
         self.mapView.addAnnotation(objectAnnotation)
+        
+        mapView.delegate = self
+        mapView.showsUserLocation = true;
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+        //        print("creating annotation views")
+        if annotation.isEqual(mapView.userLocation) {
+            return nil;
+        }
+        
+        let pinView:MKPinAnnotationView = MKPinAnnotationView()
+        pinView.annotation = annotation
+        if (annotation.title! == requestUsername) {
+            pinView.pinTintColor = UIColor.blueColor()
+            pinView.animatesDrop = false
+        } else {
+            let reuseId = "coffeehouse"
+            
+            var anView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId)
+            if anView == nil {
+                anView = MKAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+                anView!.image = UIImage(named:"coffeehousethumb")
+                anView!.canShowCallout = true
+            }
+            else {
+                //we are re-using a view, update its annotation reference...
+                anView!.annotation = annotation
+            }
+            
+            return anView
+        }
+        
+        pinView.canShowCallout = true
+        
+        return pinView
+        
+    }
+
     
 
     /*

@@ -162,14 +162,14 @@
                                     </navigationItem>
                                 </items>
                             </navigationBar>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Xsa-Lh-9wB">
-                                <rect key="frame" x="16" y="80" width="288" height="230"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="230" id="Xes-2E-oel"/>
-                                </constraints>
-                            </mapView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" placeholderIntrinsicWidth="288" placeholderIntrinsicHeight="49" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vo5-3l-HzH" colorLabel="IBBuiltInLabel-Blue">
+                                <rect key="frame" x="16" y="334" width="288" height="43"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uRp-AG-8dJ">
-                                <rect key="frame" x="16" y="378" width="288" height="95"/>
+                                <rect key="frame" x="16" y="394" width="288" height="95"/>
                                 <color key="backgroundColor" red="0.0" green="0.58847403060869929" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="95" id="VbX-XL-uul"/>
@@ -183,12 +183,12 @@
                                     <action selector="callUber:" destination="d8N-sN-FPF" eventType="touchUpInside" id="YIs-DG-Q9F"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" placeholderIntrinsicWidth="288" placeholderIntrinsicHeight="49" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vo5-3l-HzH" colorLabel="IBBuiltInLabel-Blue">
-                                <rect key="frame" x="16" y="321" width="288" height="49"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Xsa-Lh-9wB">
+                                <rect key="frame" x="16" y="69" width="288" height="241"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="230" id="Xes-2E-oel"/>
+                                </constraints>
+                            </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -197,7 +197,7 @@
                             <constraint firstItem="Xsa-Lh-9wB" firstAttribute="leading" secondItem="hXc-hL-zXK" secondAttribute="leadingMargin" id="7X0-Ya-Rgq"/>
                             <constraint firstItem="Xsa-Lh-9wB" firstAttribute="centerX" secondItem="hXc-hL-zXK" secondAttribute="centerX" id="L3w-8x-xjQ"/>
                             <constraint firstItem="VrE-kb-B3K" firstAttribute="top" secondItem="Yrb-ya-d8c" secondAttribute="bottom" id="Ux9-0D-jkj"/>
-                            <constraint firstItem="uRp-AG-8dJ" firstAttribute="top" secondItem="Xsa-Lh-9wB" secondAttribute="bottom" constant="68" id="YuJ-Qk-sNv"/>
+                            <constraint firstItem="uRp-AG-8dJ" firstAttribute="top" secondItem="Xsa-Lh-9wB" secondAttribute="bottom" constant="84" id="YuJ-Qk-sNv"/>
                             <constraint firstAttribute="trailingMargin" secondItem="VrE-kb-B3K" secondAttribute="trailing" constant="-20" id="c3U-qt-3FO"/>
                             <constraint firstItem="uRp-AG-8dJ" firstAttribute="centerX" secondItem="hXc-hL-zXK" secondAttribute="centerX" id="h1X-ob-ts9"/>
                             <constraint firstItem="Xsa-Lh-9wB" firstAttribute="trailing" secondItem="hXc-hL-zXK" secondAttribute="trailingMargin" id="mtg-Ib-7hU"/>
