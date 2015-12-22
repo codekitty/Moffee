@@ -11,6 +11,8 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
 
     var usernames = [String]()
     var locations = [CLLocationCoordinate2D]()
+    var cslocations = [CLLocationCoordinate2D]() // coffee shops location
+    var csnames = [String]() // coffee shops names
     var distances = [CLLocationDistance]()
     
     var locationManager: CLLocationManager!
@@ -46,12 +48,11 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                 if let objects = objects {
                     
                     if objects.count > 0 {
-                    
                         for object in objects {
-                            
-                            object["driverLocation"] = PFGeoPoint(latitude: (location?.latitude)!, longitude: (location?.longitude)!)
-                            object.saveInBackground()
-                            
+                            if let location = location {
+                                object["driverLocation"] = PFGeoPoint(latitude: location.latitude, longitude: location.longitude)
+                                object.saveInBackground()
+                            }
                         }
                     } else {
                     
@@ -64,48 +65,65 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
                 }
                 
             }
-            
         }
         
         // Query the requests for displaying on the table
         query = PFQuery(className: "RiderRequest")
-        query.whereKey("location", nearGeoPoint: PFGeoPoint(latitude: self.latitude, longitude: self.longitude))
+        query.whereKey("location", nearGeoPoint: PFGeoPoint(latitude: self.latitude, longitude: self.longitude),withinKilometers: 20)
         query.limit = 10
+//        query.orderByDescending("createdAt")
         query.findObjectsInBackgroundWithBlock { (objects, error) -> Void in
-            
-            if error == nil {
+
+            if error == nil && objects != nil {
                 
-                if let objects = objects {
+                self.usernames.removeAll()
+                self.locations.removeAll()
+                self.cslocations.removeAll()
+                print("returned request count: \(objects!.count)")
+                
+                for object in objects! {
                     
-                    self.usernames.removeAll()
-                    self.locations.removeAll()
+                    if object["driverResponded"] == nil {
                     
-                    for object in objects {
-                        
-                        if object["driverResponded"] == nil {
-                        
-                            if let username = object["username"] as? String {
-                                self.usernames.append(username)
-                            }
-                            if let returnedLocation = object["location"] as? PFGeoPoint {
-                                let requestLocation = CLLocationCoordinate2DMake(returnedLocation.latitude, returnedLocation.longitude)
-                                self.locations.append(requestLocation)
-                                
-                                let requestCLLocation = CLLocation(latitude: requestLocation.latitude, longitude: requestLocation.longitude)
-                                
-                                let driverCLLocation = CLLocation(latitude: location!.latitude, longitude: location!.longitude)
-                                
-                                let distance = driverCLLocation.distanceFromLocation(requestCLLocation)
-                                
-                                self.distances.append(distance/1000)
-                            }
+                        if let username = object["username"] as? String {
+                            self.usernames.append(username)
                         }
                         
+                        if let returnedLocation = object["location"] as? PFGeoPoint {
+                            let requestLocation = CLLocationCoordinate2DMake(returnedLocation.latitude, returnedLocation.longitude)
+                            self.locations.append(requestLocation)
+                            
+                            let requestCLLocation = CLLocation(latitude: requestLocation.latitude, longitude: requestLocation.longitude)
+                            
+                            let driverCLLocation = CLLocation(latitude: location!.latitude, longitude: location!.longitude)
+                            
+                            let distance = driverCLLocation.distanceFromLocation(requestCLLocation)
+                            
+                            self.distances.append(distance/1000)
+                        }
+                        
+                        if let returnedcsID = object["coffeeshopid"] as? String {
+                            let csquery = PFQuery(className: "CoffeeShop")
+                            csquery.whereKey("id", equalTo: returnedcsID)
+                            csquery.findObjectsInBackgroundWithBlock { (objects, error) -> Void in
+                                
+                                if error == nil && objects != nil {
+                                    for object in objects! {
+                                        let returnedcsLocation = object["location"]
+                                        let csLocation = CLLocationCoordinate2DMake(returnedcsLocation.latitude, returnedcsLocation.longitude)
+                                        self.cslocations.append(csLocation)
+                                        self.csnames.append(object["name"] as! (String))
+                                    }
+                                }
+                            }
+                        }
                     }
-                    self.tableView.reloadData()
-                    //print(self.locations)
-                    //print(self.usernames)
+                    
                 }
+                self.tableView.reloadData()
+                //print(self.locations)
+                //print(self.usernames)
+                
                 
             } else {
                 print(error);
@@ -154,17 +172,19 @@ class DriverViewController: UITableViewController, CLLocationManagerDelegate {
         // Pass the selected object to the new view controller.
         if segue.identifier == "logOutDriver" {
             
-            locationManager.stopUpdatingLocation()
+//            locationManager.stopUpdatingLocation()
             navigationController?.setNavigationBarHidden(true, animated: false)
             
             PFUser.logOut()
         } else if segue.identifier == "showViewRequests" {
             
             if let destination = segue.destinationViewController as? RequestViewController {
+                destination.requestCSName = csnames[tableView.indexPathForSelectedRow!.row]
+                destination.requestCSLocation = cslocations[tableView.indexPathForSelectedRow!.row]
                 destination.requestLocation = locations[tableView.indexPathForSelectedRow!.row]
                 destination.requestUsername = usernames[tableView.indexPathForSelectedRow!.row]
                 
-                locationManager.stopUpdatingLocation()
+//                locationManager.stopUpdatingLocation()
             }
             
             

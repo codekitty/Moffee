@@ -11,6 +11,8 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     var requestLocation: CLLocationCoordinate2D!
+    var requestCSLocation: CLLocationCoordinate2D!
+    var requestCSName: String!
     var requestUsername: String!
     
     @IBAction func pickUpRider(sender: AnyObject) {
@@ -31,14 +33,14 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
                             if error == nil {
                                 
                                 if (objectReturned != nil) {
-                                    //print("updating driver: \(PFUser.currentUser()?.username)");
-                                    //print("to object: \(objectReturned)");
-                                    // driver will not update until we change the permissions \ ACL!!!
+                                    print("updating driver: \(PFUser.currentUser()?.username)");
+                                    print("to object: \(objectReturned)");
+ 
                                     objectReturned!["driverResponded"] = PFUser.currentUser()?.username
                                     objectReturned!.saveInBackgroundWithBlock {
                                         (success: Bool, error: NSError?) -> Void in
                                         if (success) {
-                                            print("driver has been updated");
+                                            print("driver has been updated \(PFUser.currentUser()?.username)");
                                         } else {
                                             print(error);
                                         }
@@ -86,12 +88,17 @@ class RequestViewController: UIViewController, CLLocationManagerDelegate {
         
         self.mapView.setRegion(region, animated: true)
         
-        let pinLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(requestLocation.latitude, requestLocation.longitude)
-        let objectAnnotation = MKPointAnnotation()
+        var pinLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(requestLocation.latitude, requestLocation.longitude)
+        var objectAnnotation = MKPointAnnotation()
         objectAnnotation.coordinate = pinLocation
         objectAnnotation.title = requestUsername
         self.mapView.addAnnotation(objectAnnotation)
         
+        pinLocation = CLLocationCoordinate2DMake(requestCSLocation.latitude, requestCSLocation.longitude)
+        objectAnnotation = MKPointAnnotation()
+        objectAnnotation.coordinate = pinLocation
+        objectAnnotation.title = requestCSName
+        self.mapView.addAnnotation(objectAnnotation)
     }
 
     override func didReceiveMemoryWarning() {
