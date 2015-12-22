@@ -241,10 +241,13 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
         
         self.driverOnTheWay = true
         
-        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+        let latDiff = driverLocation.coordinate.latitude - userLocation.coordinate.latitude;
+        let lonDiff = driverLocation.coordinate.longitude - userLocation.coordinate.longitude;
         
-        let latDelta = (abs(driverLocation.coordinate.latitude - userLocation.coordinate.latitude) + 0.006)*2
-        let longDelta = (abs(driverLocation.coordinate.longitude - userLocation.coordinate.longitude) + 0.006)*2
+        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude + (latDiff)*0.5, longitude: userLocation.coordinate.longitude + (lonDiff)*0.5)
+        
+        let latDelta = (abs(latDiff) + 0.01)
+        let longDelta = (abs(lonDiff) + 0.01)
         
         let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: longDelta))
         
