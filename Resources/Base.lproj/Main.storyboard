@@ -168,7 +168,7 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uRp-AG-8dJ">
+                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uRp-AG-8dJ">
                                 <rect key="frame" x="16" y="394" width="288" height="95"/>
                                 <color key="backgroundColor" red="0.0" green="0.58847403060869929" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -183,24 +183,24 @@
                                     <action selector="callUber:" destination="d8N-sN-FPF" eventType="touchUpInside" id="YIs-DG-Q9F"/>
                                 </connections>
                             </button>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Xsa-Lh-9wB">
-                                <rect key="frame" x="16" y="69" width="288" height="241"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="230" id="Xes-2E-oel"/>
-                                </constraints>
-                            </mapView>
+                            <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ddW-Bl-CDh">
+                                <rect key="frame" x="16" y="69" width="288" height="230"/>
+                                <subviews>
+                                    <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Xsa-Lh-9wB">
+                                        <rect key="frame" x="0.0" y="0.0" width="288" height="230"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="230" id="Xes-2E-oel"/>
+                                        </constraints>
+                                    </mapView>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="VrE-kb-B3K" firstAttribute="leading" secondItem="hXc-hL-zXK" secondAttribute="leadingMargin" constant="-20" id="2sP-Re-K6W"/>
-                            <constraint firstItem="Xsa-Lh-9wB" firstAttribute="top" secondItem="VrE-kb-B3K" secondAttribute="bottom" constant="16" id="6mA-W0-0Mu"/>
-                            <constraint firstItem="Xsa-Lh-9wB" firstAttribute="leading" secondItem="hXc-hL-zXK" secondAttribute="leadingMargin" id="7X0-Ya-Rgq"/>
-                            <constraint firstItem="Xsa-Lh-9wB" firstAttribute="centerX" secondItem="hXc-hL-zXK" secondAttribute="centerX" id="L3w-8x-xjQ"/>
                             <constraint firstItem="VrE-kb-B3K" firstAttribute="top" secondItem="Yrb-ya-d8c" secondAttribute="bottom" id="Ux9-0D-jkj"/>
-                            <constraint firstItem="uRp-AG-8dJ" firstAttribute="top" secondItem="Xsa-Lh-9wB" secondAttribute="bottom" constant="84" id="YuJ-Qk-sNv"/>
                             <constraint firstAttribute="trailingMargin" secondItem="VrE-kb-B3K" secondAttribute="trailing" constant="-20" id="c3U-qt-3FO"/>
                             <constraint firstItem="uRp-AG-8dJ" firstAttribute="centerX" secondItem="hXc-hL-zXK" secondAttribute="centerX" id="h1X-ob-ts9"/>
-                            <constraint firstItem="Xsa-Lh-9wB" firstAttribute="trailing" secondItem="hXc-hL-zXK" secondAttribute="trailingMargin" id="mtg-Ib-7hU"/>
                         </constraints>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
@@ -321,6 +321,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="sGZ-8P-NXt"/>
+        <segue reference="acO-LA-dAC"/>
     </inferredMetricsTieBreakers>
 </document>
