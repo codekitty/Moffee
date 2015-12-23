@@ -348,6 +348,20 @@ class RiderViewController: UIViewController, CLLocationManagerDelegate, MKMapVie
         
         if (regionSize < 0.003) {
             self.fetchCafesAroundLocation(getMovedMapCenter)
+        } else if (regionSize > 1) {
+            // reset region size, we do not allow
+            if (self.userLocation != nil) {
+                let lat = self.userLocation!.coordinate.latitude;
+                let lon = self.userLocation!.coordinate.longitude;
+                let center = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                 print("WARN: Latitude \(lat) and Longitude \(lon)")
+                
+                let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                
+                self.mapView.setRegion(region, animated: true)
+                print("region set");
+
+            }
         }
     }
 
